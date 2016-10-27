@@ -7,13 +7,15 @@ class Player():
     def __init__(self, w, h):
         self.x = 0
         self.y = 0
+        self.speed_x = 0
+        self.speed_y = 0
         self.width = w
         self.height = h
         self.vertices = []
 
-    def update(self, x, y):
-        self.x = x
-        self.y = y
+    def update(self, x_speed, y_speed):
+        self.x += x_speed
+        self.y += y_speed
         # We need to have a list off all the player's corners for the projection process
         self.vertices = [[self.x, self.y], [self.x+self.height, self.y], [self.x+self.height, self.y + self.width], [self.x, self.y+self.width]]
 
@@ -68,7 +70,7 @@ class Polygon():
         if collided:
             return (0,255,0)
         else:
-            return  (255,255,255)
+            return (255,255,255)
 
     def project(self, normal):
         projected = []
@@ -105,6 +107,8 @@ def main():
 
     # Create sprites
     player = Player(20,20)
+    x_speed = 0
+    y_speed = 0
     polygon = Polygon([[100,100],[100,200],[200,200]])
 
     # -------- Main Program Loop -----------
@@ -113,12 +117,26 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_speed = -3
+                elif event.key == pygame.K_RIGHT:
+                    x_speed = 3
+                elif event.key == pygame.K_UP:
+                    y_speed = -3
+                elif event.key == pygame.K_DOWN:
+                    y_speed = 3
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_UP:
+                    y_speed = 0
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    x_speed = 0
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
         mouse_y = pos[1]
 
         # Game logic
-        player.update(mouse_x, mouse_y)
+        player.update(x_speed, y_speed)
         colour = polygon.collide(player)
 
         # Drawing
