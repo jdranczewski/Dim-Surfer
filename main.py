@@ -1,5 +1,6 @@
 import pygame
 import math
+import time
 
 
 class Player():
@@ -35,6 +36,7 @@ class Polygon():
         self.vertices = vert
 
     def collide(self, player):
+        start = time.clock()
         # We check whether the player is colliding with the polygon
         collided = 0
         checked = []
@@ -62,6 +64,7 @@ class Polygon():
             else:
                 collided = 1
         # We return the correct screen colour
+        print(time.clock()-start)
         if collided:
             return (0,255,0)
         else:
