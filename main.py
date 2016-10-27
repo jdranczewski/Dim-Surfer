@@ -23,8 +23,9 @@ class Player():
             dp = vect[0] * normal[0] + vect[1] * normal[1]
             projected_v = [normal[0] * dp, normal[1] * dp]
             projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
-            projected.append(projected_l)
-        return [min(projected), max(projected)]
+            sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
+            projected.append(math.copysign(projected_l, sign_p))
+        return [min(projected), max(projected), sign_p]
 
     def draw(self, screen):
         pygame.draw.rect(screen, (0,0,0), [self.x, self.y, self.width, self.height])
@@ -73,9 +74,13 @@ class Polygon():
             dp = vect[0]*normal[0] + vect[1]*normal[1]
             projected_v = [normal[0]*dp, normal[1]*dp]
             projected_l = math.sqrt(projected_v[0]**2 + projected_v[1]**2)
-            projected.append(projected_l)
+            # We need to calculate the dot product of the projected vector and the normal vector,
+            # because the length of the projected vector will always be positive,
+            # and we want it to be negative if the projected vector faces in the opposite direction
+            sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
+            projected.append(math.copysign(projected_l, sign_p))
         # We return the min and max vector length - the boundaries of the projection
-        return [min(projected), max(projected)]
+        return [min(projected), max(projected), sign_p]
 
     def draw(self, screen):
         pygame.draw.polygon(screen, (255,0,0), self.vertices)
@@ -97,7 +102,7 @@ def main():
 
     # Create sprites
     player = Player(20,20)
-    polygon = Polygon([[100,100],[200,200],[300,100]])
+    polygon = Polygon([[100,100],[100,200],[200,200]])
 
     # -------- Main Program Loop -----------
     while not done:
