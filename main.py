@@ -38,10 +38,12 @@ class Polygon():
         self.vertices = vert
 
     def collide(self, player):
-        start = time.clock()
+        # start = time.clock()
         # We check whether the player is colliding with the polygon
         collided = 0
         checked = []
+        out_v = []
+        out_v_val = []
         # We check every face
         for i in range(len(self.vertices)):
             nexti = (i+1) % len(self.vertices)
@@ -64,13 +66,17 @@ class Polygon():
                 # we can stop checking when there is no overlap on at least one of the axes
                 break
             else:
+                out_v_val.append(me_p[1] - player_p[0])
+                out_v.append([(me_p[1] - player_p[0])*normal[0], (me_p[1] - player_p[0])*normal[1]])
+                out_v_val.append(player_p[1] - me_p[0])
+                out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
                 collided = 1
-        # We return the correct screen colour
-        print(time.clock()-start)
+        # We can return the correct screen colour
+        # print(time.clock()-start)
         if collided:
-            return (0,255,0)
+            return [(0,255,0), out_v[out_v_val.index(min(out_v_val))]]
         else:
-            return (255,255,255)
+            return [(255,255,255), [0,0]]
 
     def project(self, normal):
         projected = []
@@ -109,7 +115,7 @@ def main():
     player = Player(20,20)
     x_speed = 0
     y_speed = 0
-    polygon = Polygon([[100,100],[100,200],[200,200]])
+    polygon = Polygon([[100,100],[150,200],[200,200]])
 
     # -------- Main Program Loop -----------
     while not done:
@@ -137,10 +143,11 @@ def main():
 
         # Game logic
         player.update(x_speed, y_speed)
-        colour = polygon.collide(player)
+        collide = polygon.collide(player)
+        player.update(collide[1][0], collide[1][1])
 
         # Drawing
-        screen.fill(colour)
+        screen.fill(collide[0])
         polygon.draw(screen)
         player.draw(screen)
 
