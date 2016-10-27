@@ -25,7 +25,7 @@ def main():
         # Game logic
 
         # Drawing
-        screen.fill(WHITE)
+        screen.fill((255, 255, 255))
 
         # Update the screen
         pygame.display.flip()
