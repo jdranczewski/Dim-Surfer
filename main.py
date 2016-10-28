@@ -41,36 +41,63 @@ class Polygon():
         # start = time.clock()
         # We check whether the player is colliding with the polygon
         collided = 0
-        checked = []
         out_v = []
         out_v_val = []
-        # We check every face
-        for i in range(len(self.vertices)):
-            nexti = (i+1) % len(self.vertices)
-            # Using vector substraction we obtain the vector representing the face...
-            vector = [self.vertices[nexti][0]-self.vertices[i][0], self.vertices[nexti][1]-self.vertices[i][1]]
-            # ...its lenght...
-            len_v = math.sqrt(vector[0]**2+vector[1]**2)
-            # ... and convert it to a unit vector
-            unit_v = [vector[0]/len_v, vector[1]/len_v]
-            # Then we calculate the vector perpendicular to it, which represents the normal axis
-            normal = [-unit_v[1], unit_v[0]]
-            checked.append(normal)
-            # We project sprites onto the axis
+        # We check the x and y axes
+        # First the x axis
+        normal = [1, 0]
+        me_p = self.project(normal)
+        player_p = player.project(normal)
+        if (me_p[1] < player_p[0]) or (me_p[0] > player_p[1]):
+            collided = 0
+        else:
+            out_v_val.append(me_p[1] - player_p[0])
+            out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
+            out_v_val.append(player_p[1] - me_p[0])
+            out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
+            collided = 1
+        #If there is an overlap at the x axis, we check the y axis
+        if collided:
+            normal = [0, 1]
             me_p = self.project(normal)
             player_p = player.project(normal)
-            # And check for overlap
-            if (me_p[1] < player_p[0]) or (me_p[0]>player_p[1]):
+            if (me_p[1] < player_p[0]) or (me_p[0] > player_p[1]):
                 collided = 0
-                # Thanks to the rules of the Separating Axes Theorem
-                # we can stop checking when there is no overlap on at least one of the axes
-                break
             else:
                 out_v_val.append(me_p[1] - player_p[0])
-                out_v.append([(me_p[1] - player_p[0])*normal[0], (me_p[1] - player_p[0])*normal[1]])
+                out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
                 out_v_val.append(player_p[1] - me_p[0])
                 out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
                 collided = 1
+        # We check every face if there was an overlap on x and y axes
+        if collided:
+            for i in range(len(self.vertices)):
+                nexti = (i+1) % len(self.vertices)
+                # Using vector substraction we obtain the vector representing the face...
+                vector = [self.vertices[nexti][0]-self.vertices[i][0], self.vertices[nexti][1]-self.vertices[i][1]]
+                # ...its lenght...
+                len_v = math.sqrt(vector[0]**2+vector[1]**2)
+                # ... and convert it to a unit vector
+                unit_v = [vector[0]/len_v, vector[1]/len_v]
+                # Then we calculate the vector perpendicular to it, which represents the normal axis
+                normal = [-unit_v[1], unit_v[0]]
+                #We check this axis only if it is not the x nor the y axis
+                if normal[0]*normal[1] != 0:
+                    # We project sprites onto the axis
+                    me_p = self.project(normal)
+                    player_p = player.project(normal)
+                    # And check for overlap
+                    if (me_p[1] < player_p[0]) or (me_p[0]>player_p[1]):
+                        collided = 0
+                        # Thanks to the rules of the Separating Axes Theorem
+                        # we can stop checking when there is no overlap on at least one of the axes
+                        break
+                    else:
+                        out_v_val.append(me_p[1] - player_p[0])
+                        out_v.append([(me_p[1] - player_p[0])*normal[0], (me_p[1] - player_p[0])*normal[1]])
+                        out_v_val.append(player_p[1] - me_p[0])
+                        out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
+                        collided = 1
         # We can return the correct screen colour
         # print(time.clock()-start)
         if collided:
