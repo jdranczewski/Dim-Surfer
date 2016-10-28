@@ -7,17 +7,27 @@ class Player():
     def __init__(self, w, h):
         self.x = 0
         self.y = 0
-        self.speed_x = 0
-        self.speed_y = 0
+        self.x_speed = 0
+        self.y_speed = 0
+        self.acceleration = 0.3
+        self.decceleration = 0.95
         self.width = w
         self.height = h
         self.vertices = []
 
     def update(self, x_speed, y_speed):
-        self.x += x_speed
-        self.y += y_speed
+        self.x_speed += x_speed*self.acceleration
+        self.y_speed += y_speed*self.acceleration + 0.1
+        self.x_speed *= self.decceleration
+        self.y_speed *= self.decceleration
+        self.x += self.x_speed
+        self.y += self.y_speed
         # We need to have a list off all the player's corners for the projection process
         self.vertices = [[self.x, self.y], [self.x+self.height, self.y], [self.x+self.height, self.y + self.width], [self.x, self.y+self.width]]
+
+    def collision_displace(self, x, y):
+        self.x += x
+        self.y += y
 
     def project(self, normal):
         # Comments to the projection process are placed in the Polygon class
@@ -158,13 +168,13 @@ def main():
                 done = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    x_speed = -3
+                    x_speed = -1
                 elif event.key == pygame.K_RIGHT:
-                    x_speed = 3
+                    x_speed = 1
                 elif event.key == pygame.K_UP:
-                    y_speed = -3
+                    y_speed = -1
                 elif event.key == pygame.K_DOWN:
-                    y_speed = 3
+                    y_speed = 1
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_DOWN or event.key == pygame.K_UP:
                     y_speed = 0
@@ -177,7 +187,7 @@ def main():
         # Game logic
         player.update(x_speed, y_speed)
         collide = polygon.collide(player)
-        player.update(collide[1][0], collide[1][1])
+        player.collision_displace(collide[1][0], collide[1][1])
 
         # Drawing
         screen.fill(collide[0])
