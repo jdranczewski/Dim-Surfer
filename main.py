@@ -51,10 +51,12 @@ class Polygon():
         if (me_p[1] < player_p[0]) or (me_p[0] > player_p[1]):
             collided = 0
         else:
-            out_v_val.append(me_p[1] - player_p[0])
-            out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
-            out_v_val.append(player_p[1] - me_p[0])
-            out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
+            if (me_p[1] - player_p[0]) >= 0:
+                out_v_val.append(me_p[1] - player_p[0])
+                out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
+            if (me_p[0] - player_p[1]) <= 0:
+                out_v_val.append(player_p[1] - me_p[0])
+                out_v.append([(me_p[0] - player_p[1]) * normal[0], (me_p[0] - player_p[1]) * normal[1]])
             collided = 1
         #If there is an overlap at the x axis, we check the y axis
         if collided:
@@ -64,10 +66,12 @@ class Polygon():
             if (me_p[1] < player_p[0]) or (me_p[0] > player_p[1]):
                 collided = 0
             else:
-                out_v_val.append(me_p[1] - player_p[0])
-                out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
-                out_v_val.append(player_p[1] - me_p[0])
-                out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
+                if (me_p[1] - player_p[0]) >= 0:
+                    out_v_val.append(me_p[1] - player_p[0])
+                    out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
+                if (me_p[0] - player_p[1]) <= 0:
+                    out_v_val.append(player_p[1] - me_p[0])
+                    out_v.append([(me_p[0] - player_p[1]) * normal[0], (me_p[0] - player_p[1]) * normal[1]])
                 collided = 1
         # We check every face if there was an overlap on x and y axes
         if collided:
@@ -93,10 +97,12 @@ class Polygon():
                         # we can stop checking when there is no overlap on at least one of the axes
                         break
                     else:
-                        out_v_val.append(me_p[1] - player_p[0])
-                        out_v.append([(me_p[1] - player_p[0])*normal[0], (me_p[1] - player_p[0])*normal[1]])
-                        out_v_val.append(player_p[1] - me_p[0])
-                        out_v.append([(player_p[1] - me_p[0]) * normal[0], (player_p[1] - me_p[0]) * normal[1]])
+                        if (me_p[1] - player_p[0]) >= 0:
+                            out_v_val.append(me_p[1] - player_p[0])
+                            out_v.append([(me_p[1] - player_p[0]) * normal[0], (me_p[1] - player_p[0]) * normal[1]])
+                        if (me_p[0] - player_p[1]) <= 0:
+                            out_v_val.append(player_p[1] - me_p[0])
+                            out_v.append([(me_p[0] - player_p[1]) * normal[0], (me_p[0] - player_p[1]) * normal[1]])
                         collided = 1
         # We can return the correct screen colour
         # print(time.clock()-start)
