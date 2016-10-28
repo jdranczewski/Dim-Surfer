@@ -15,9 +15,11 @@ class Player():
         self.height = h
         self.vertices = []
 
-    def update(self, x_speed, y_speed):
+    def update(self, x_speed, y_speed, collided):
         self.x_speed += x_speed*self.acceleration
-        self.y_speed += y_speed*self.acceleration + 0.1
+        self.y_speed += 0.1
+        if collided and y_speed<0:
+            self.y_speed = -10
         self.x_speed *= self.decceleration
         self.y_speed *= self.decceleration
         self.x += self.x_speed
@@ -117,9 +119,9 @@ class Polygon():
         # We can return the correct screen colour
         # print(time.clock()-start)
         if collided:
-            return [(0,255,0), out_v[out_v_val.index(min(out_v_val))]]
+            return [1, out_v[out_v_val.index(min(out_v_val))]]
         else:
-            return [(255,255,255), [0,0]]
+            return [0, [0,0]]
 
     def project(self, normal):
         projected = []
@@ -158,7 +160,8 @@ def main():
     player = Player(20,20)
     x_speed = 0
     y_speed = 0
-    polygon = Polygon([[100,100],[150,200],[200,200]])
+    collided = 0
+    polygon = Polygon([[200,200],[150,250],[200,300], [300,300], [350,250], [300,200]])
 
     # -------- Main Program Loop -----------
     while not done:
@@ -185,12 +188,17 @@ def main():
         mouse_y = pos[1]
 
         # Game logic
-        player.update(x_speed, y_speed)
+        player.update(x_speed, y_speed, collided)
         collide = polygon.collide(player)
-        player.collision_displace(collide[1][0], collide[1][1])
+        collided = collide[0]
+        player.collision_displace(collide[1][0], collide[1][1],)
 
         # Drawing
-        screen.fill(collide[0])
+        if collided:
+            colour = (0,255,0)
+        else:
+            colour = (255,255,255)
+        screen.fill(colour)
         polygon.draw(screen)
         player.draw(screen)
 
