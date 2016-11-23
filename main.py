@@ -51,7 +51,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Create sprites
-    level = Level("test")
+    level = Level("workfile")
     print(len(level.data[354]))
 
     # -------- Main Program Loop -----------
@@ -68,7 +68,7 @@ def main():
 
         # Drawing
         screen.fill((255,255,255))
-        level.draw(screen, 300)
+        level.draw(screen, mouse_y)
 
         # Update the screen
         pygame.display.flip()
