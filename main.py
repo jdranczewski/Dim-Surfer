@@ -2,6 +2,39 @@ import pygame
 import math
 import time
 
+
+class Level():
+    def __init__(self, name):
+        self.name = name
+        self.data = self.obtain()
+        self.z = 0
+
+    def obtain(self):
+        data = [[[]]]
+        polygonI = 0
+        zI = 0
+        with open('level_data/' + self.name + ".txt", 'r') as f:
+            for line in f:
+                if line == "#\n":
+                    data[zI].pop()
+                    data.append([[]])
+                    zI += 1
+                    polygonI = 0
+                elif line == "\n":
+                    data[zI].append([])
+                    polygonI += 1
+                else:
+                    data[zI][polygonI].append([float(x) for x in line.split(" ")])
+            data.pop()
+        f.closed
+        return data
+
+    def draw(self, screen, z):
+        self.z = z
+        drawing = self.data[self.z]
+        for polygon in drawing:
+            pygame.draw.polygon(screen, (255, 0, 0), polygon)
+
 def main():
     pygame.init()
 
@@ -18,6 +51,8 @@ def main():
     clock = pygame.time.Clock()
 
     # Create sprites
+    level = Level("test")
+    print(len(level.data[354]))
 
     # -------- Main Program Loop -----------
     while not done:
@@ -33,6 +68,7 @@ def main():
 
         # Drawing
         screen.fill((255,255,255))
+        level.draw(screen, 300)
 
         # Update the screen
         pygame.display.flip()
