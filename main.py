@@ -13,12 +13,13 @@ class Player():
         self.decceleration = 0.95
         self.width = w
         self.height = h
-        self.vertices = []
+        self.vertices = [[self.x, self.y], [self.x + self.height, self.y], [self.x + self.height, self.y + self.width],
+                         [self.x, self.y + self.width]]
 
-    def update(self, x_speed, y_speed, collided):
+    def update(self, x_speed, y_speed, collided, y_ev):
         self.x_speed += x_speed*self.acceleration
         self.y_speed += 0.1
-        if collided and y_speed<0:
+        if collided and y_speed<0 and y_ev<0:
             self.y_speed = -10
         self.x_speed *= self.decceleration
         self.y_speed *= self.decceleration
@@ -162,6 +163,7 @@ def main():
     y_speed = 0
     collided = 0
     polygon = Polygon([[200,200],[150,250],[200,300], [300,300], [350,250], [300,200]])
+    collide = polygon.collide(player)
 
     # -------- Main Program Loop -----------
     while not done:
@@ -188,10 +190,10 @@ def main():
         mouse_y = pos[1]
 
         # Game logic
-        player.update(x_speed, y_speed, collided)
+        player.update(x_speed, y_speed, collided, collide[1][1])
         collide = polygon.collide(player)
         collided = collide[0]
-        player.collision_displace(collide[1][0], collide[1][1],)
+        player.collision_displace(collide[1][0], collide[1][1])
 
         # Drawing
         if collided:
