@@ -29,9 +29,14 @@ class Level():
         f.closed
         return data
 
-    def draw(self, screen, z):
-        self.z = z
-        drawing = self.data[self.z]
+    def update(self, mouse_z):
+        diff = mouse_z-self.z
+        if abs(diff)>50:
+            diff = 50*abs(diff)/diff
+        self.z += diff*0.1
+
+    def draw(self, screen):
+        drawing = self.data[math.floor(self.z)]
         for polygon in drawing:
             pygame.draw.polygon(screen, (255, 0, 0), polygon)
 
@@ -65,10 +70,11 @@ def main():
         mouse_y = pos[1]
 
         # Game logic
+        level.update(mouse_y)
 
         # Drawing
         screen.fill((255,255,255))
-        level.draw(screen, mouse_y)
+        level.draw(screen)
 
         # Update the screen
         pygame.display.flip()
