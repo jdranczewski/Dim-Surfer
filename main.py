@@ -15,6 +15,20 @@ class Player():
         self.vertices = [[self.x, self.y], [self.x + self.height, self.y], [self.x + self.height, self.y + self.width],
                          [self.x, self.y + self.width]]
 
+    def project(self, normal):
+        # We create a list of vectors of the Player's vertices projected onto a normal vector
+        projected = []
+        for vect in self.vertices:
+            dp = vect[0] * normal[0] + vect[1] * normal[1]
+            # We calculate the projected vector
+            projected_v = [normal[0] * dp, normal[1] * dp]
+            projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
+            sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
+            # And add it to the list
+            projected.append(math.copysign(projected_l, sign_p))
+        # Minimal and maximum vectors signify the boarder of the projection
+        return [min(projected), max(projected), sign_p]
+
     def draw(self, screen):
         pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
 
