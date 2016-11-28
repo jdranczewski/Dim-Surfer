@@ -15,6 +15,23 @@ class Player():
         self.vertices = [[self.x, self.y], [self.x + self.height, self.y], [self.x + self.height, self.y + self.width],
                          [self.x, self.y + self.width]]
 
+    def update(self, x_speed, y_speed, collided, y_ev):
+        self.x_speed += x_speed * self.acceleration
+        self.y_speed += 0.1
+        if collided and y_speed < 0 and y_ev < 0:
+            self.y_speed = -10
+        self.x_speed *= self.decceleration
+        self.y_speed *= self.decceleration
+        self.x += self.x_speed
+        self.y += self.y_speed
+        # We need to have a list off all the player's corners for the projection process
+        self.vertices = [[self.x, self.y], [self.x + self.height, self.y], [self.x + self.height, self.y + self.width],
+                         [self.x, self.y + self.width]]
+
+    def collision_displace(self, x, y):
+        self.x += x
+        self.y += y
+
     def project(self, normal):
         # We create a list of vectors of the Player's vertices projected onto a normal vector
         projected = []
