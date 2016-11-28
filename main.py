@@ -2,6 +2,21 @@ import pygame
 import math
 import time
 
+class Player():
+    def __init__(self, w, h):
+        self.x = 0
+        self.y = 0
+        self.x_speed = 0
+        self.y_speed = 0
+        self.acceleration = 0.3
+        self.decceleration = 0.95
+        self.width = w
+        self.height = h
+        self.vertices = [[self.x, self.y], [self.x + self.height, self.y], [self.x + self.height, self.y + self.width],
+                         [self.x, self.y + self.width]]
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
 
 class Level():
     def __init__(self, name):
@@ -57,7 +72,9 @@ def main():
 
     # Create sprites
     level = Level("workfile")
-    print(len(level.data[354]))
+    player = Player(20, 20)
+    x_speed = 0
+    y_speed = 0
 
     # -------- Main Program Loop -----------
     while not done:
@@ -65,6 +82,20 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_speed = -1
+                elif event.key == pygame.K_RIGHT:
+                    x_speed = 1
+                elif event.key == pygame.K_UP:
+                    y_speed = -1
+                elif event.key == pygame.K_DOWN:
+                    y_speed = 1
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN or event.key == pygame.K_UP:
+                    y_speed = 0
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    x_speed = 0
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
         mouse_y = pos[1]
@@ -75,6 +106,7 @@ def main():
         # Drawing
         screen.fill((255,255,255))
         level.draw(screen)
+        player.draw(screen)
 
         # Update the screen
         pygame.display.flip()
