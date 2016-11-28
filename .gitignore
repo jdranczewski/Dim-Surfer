@@ -53,6 +53,8 @@ fabric.properties
 # .idea/misc.xml 
 # *.ipr
 
+# Ignore all!
+.idea/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
