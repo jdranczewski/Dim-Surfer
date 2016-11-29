@@ -2,6 +2,7 @@ import pygame
 import math
 import time
 
+
 class Player():
     def __init__(self, w, h):
         self.x = 0
@@ -24,6 +25,7 @@ class Player():
         self.y_speed *= self.decceleration
         self.x += self.x_speed
         self.y += self.y_speed
+        self.y = self.y % 500
         # We need to have a list off all the player's corners for the projection process
         self.vertices = [[self.x, self.y], [self.x + self.height, self.y], [self.x + self.height, self.y + self.width],
                          [self.x, self.y + self.width]]
@@ -105,24 +107,47 @@ class Level():
             # We then calculateEjection() to calculate the ejection vectors.
             # It also returns a boolenan that tells us whether the objects are actually overlaping on that axis
             # We start with the x axis:
-            collided = calculateEjection([1,0], polygon, player.vertices, out_v, out_v_val)
+            collided = calculateEjection([1, 0], polygon, player.vertices, out_v, out_v_val)
+            print(collided)
             # If there was overlap, we then check the y axis:
-            collided = calculateEjection([0, 1], polygon, player.vertices, out_v, out_v_val)
+            if collided:
+                collided = calculateEjection([0, 1], polygon, player.vertices, out_v, out_v_val)
+            # If there was overlap on X and Y axes we then check the rest of them,
+            # in accordance to the Separating Axis Theorem
+            if collided:
+                for i in range(len(polygon)):
+                    nexti = (i + 1) % len(polygon)
+                    # Using vector substraction we obtain the vector representing the face...
+                    vector = [polygon[nexti][0] - polygon[i][0], polygon[nexti][1] - polygon[i][1]]
+                    # ...its lenght...
+                    len_v = math.sqrt(vector[0] ** 2 + vector[1] ** 2)
+                    # ... and convert it to a unit vector
+                    unit_v = [vector[0] / len_v, vector[1] / len_v]
+                    # Then we calculate the vector perpendicular to it, which represents the normal axis
+                    normal = [-unit_v[1], unit_v[0]]
+                    # We check this axis only if it is not the x nor the y axis
+                    if normal[0] * normal[1] != 0:
+                        collided = calculateEjection(normal, polygon, player.vertices, out_v, out_v_val)
+                        if not collided:
+                            # Thanks to the rules of the Separating Axes Theorem
+                            # we can stop checking when there is no overlap on at least one of the axes
+                            break
             if collided:
                 return [1, out_v[out_v_val.index(min(out_v_val))]]
             else:
                 return [0, [0, 0]]
 
     def update(self, mouse_z):
-        diff = mouse_z-self.z
-        if abs(diff)>50:
-            diff = 50*abs(diff)/diff
-        self.z += diff*0.1
+        diff = mouse_z - self.z
+        if abs(diff) > 50:
+            diff = 50 * abs(diff) / diff
+        self.z += diff * 0.1
 
     def draw(self, screen):
         drawing = self.data[math.floor(self.z)]
         for polygon in drawing:
             pygame.draw.polygon(screen, (255, 0, 0), polygon)
+
 
 def main():
     pygame.init()
@@ -142,6 +167,7 @@ def main():
     # Create sprites
     level = Level("workfile")
     player = Player(20, 20)
+    collide = level.collide(player)
     x_speed = 0
     y_speed = 0
 
@@ -171,11 +197,12 @@ def main():
 
         # Game logic
         level.update(mouse_y)
+        player.update(x_speed, y_speed, collide[0], collide[1][1])
         collide = level.collide(player)
         player.collision_displace(collide[1][0], collide[1][1])
 
         # Drawing
-        screen.fill((255,255,255))
+        screen.fill((255, 255, 255))
         level.draw(screen)
         player.draw(screen)
 
