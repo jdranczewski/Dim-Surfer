@@ -90,7 +90,11 @@ class Level():
         return data
 
     def collide(self, player):
-        for polygon in self.data[math.floor(self.z)]:
+        data = self.data[math.floor(self.z)]
+        # If the polygon list is empty, return 0 as the collision vector
+        if not len(data):
+            return [0, [0, 0]]
+        for polygon in data:
             # We start by assuming that there is no overlap
             collided = 0
             # We create an empty list of ejection vectors
@@ -104,6 +108,10 @@ class Level():
             collided = calculateEjection([1,0], polygon, player.vertices, out_v, out_v_val)
             # If there was overlap, we then check the y axis:
             collided = calculateEjection([0, 1], polygon, player.vertices, out_v, out_v_val)
+            if collided:
+                return [1, out_v[out_v_val.index(min(out_v_val))]]
+            else:
+                return [0, [0, 0]]
 
     def update(self, mouse_z):
         diff = mouse_z-self.z
@@ -164,7 +172,7 @@ def main():
         # Game logic
         level.update(mouse_y)
         collide = level.collide(player)
-        # player.collision_displace(collide[1][0], collide[1][1])
+        player.collision_displace(collide[1][0], collide[1][1])
 
         # Drawing
         screen.fill((255,255,255))
