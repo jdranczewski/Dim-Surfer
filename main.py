@@ -105,7 +105,6 @@ class Level():
             # It also returns a boolenan that tells us whether the objects are actually overlaping on that axis
             # We start with the x axis:
             collided = calculateEjection([1, 0], polygon, player.vertices, out_v, out_v_val)
-            print(collided)
             # If there was overlap, we then check the y axis:
             if collided:
                 collided = calculateEjection([0, 1], polygon, player.vertices, out_v, out_v_val)
@@ -207,6 +206,7 @@ def main():
         pygame.display.flip()
 
         # Set the maximum framerate to 60fps
+        pygame.display.set_caption(str(clock.get_fps()))
         clock.tick(60)
 
     # Close the window
