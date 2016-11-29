@@ -32,22 +32,36 @@ class Player():
         self.x += x
         self.y += y
 
-    def project(self, normal):
-        # We create a list of vectors of the Player's vertices projected onto a normal vector
-        projected = []
-        for vect in self.vertices:
-            dp = vect[0] * normal[0] + vect[1] * normal[1]
-            # We calculate the projected vector
-            projected_v = [normal[0] * dp, normal[1] * dp]
-            projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
-            sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
-            # And add it to the list
-            projected.append(math.copysign(projected_l, sign_p))
-        # Minimal and maximum vectors signify the boarder of the projection
-        return [min(projected), max(projected), sign_p]
-
     def draw(self, screen):
         pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
+
+def project(polygon, normal):
+    projected = []
+    for vect in polygon:
+        dp = vect[0] * normal[0] + vect[1] * normal[1]
+        projected_v = [normal[0] * dp, normal[1] * dp]
+        projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
+        sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
+        projected.append(math.copysign(projected_l, sign_p))
+    return [min(projected), max(projected)]
+
+def calculateEjection(normal, polygon, player, out_v, out_v_val):
+    # We calculate projections of both the polygon and the player onto the normal vector
+    polygon_p = project(polygon, normal)
+    player_p = project(player, normal)
+    collided = 0
+    # We check whether there is overlap
+    if (polygon_p[1] < player_p[0]) or (polygon_p[0] > player_p[1]):
+        collided = 0
+    else:
+        if (polygon_p[1] - player_p[0]) >= 0:
+            out_v_val.append(polygon_p[1] - player_p[0])
+            out_v.append([(polygon_p[1] - player_p[0]) * normal[0], (polygon_p[1] - player_p[0]) * normal[1]])
+        if (polygon_p[0] - player_p[1]) <= 0:
+            out_v_val.append(player_p[1] - polygon_p[0])
+            out_v.append([(polygon_p[0] - player_p[1]) * normal[0], (polygon_p[0] - player_p[1]) * normal[1]])
+        collided = 1
+    return collided
 
 class Level():
     def __init__(self, name):
@@ -74,6 +88,20 @@ class Level():
             data.pop()
         f.closed
         return data
+
+    def collide(self, player):
+        for polygon in self.data[math.floor(self.z)]:
+            # We start by assuming that there is no overlap
+            collided = 0
+            # We create an empty list of ejection vectors
+            out_v = []
+            # And their values for easy comparision
+            out_v_val = []
+
+            # We then calculateEjection() to calculate the ejection vectors.
+            # It also returns a boolenan that tells us whether the objects are actually overlaping on that axis
+            # We start with the x axis:
+            calculateEjection([1,0], polygon, player.vertices, out_v, out_v_val)
 
     def update(self, mouse_z):
         diff = mouse_z-self.z
@@ -133,6 +161,8 @@ def main():
 
         # Game logic
         level.update(mouse_y)
+        collide = level.collide(player)
+        # player.collision_displace(collide[1][0], collide[1][1])
 
         # Drawing
         screen.fill((255,255,255))
