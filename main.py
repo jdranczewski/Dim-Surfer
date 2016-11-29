@@ -93,9 +93,6 @@ class Level():
 
     def collide(self, player):
         data = self.data[math.floor(self.z)]
-        # If the polygon list is empty, return 0 as the collision vector
-        if not len(data):
-            return [0, [0, 0]]
         for polygon in data:
             # We start by assuming that there is no overlap
             collided = 0
@@ -134,8 +131,8 @@ class Level():
                             break
             if collided:
                 return [1, out_v[out_v_val.index(min(out_v_val))]]
-            else:
-                return [0, [0, 0]]
+        # If the polygon list is empty, return 0 as the collision vector
+        return [0, [0, 0]]
 
     def update(self, mouse_z):
         diff = mouse_z - self.z
