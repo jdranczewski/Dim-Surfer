@@ -101,7 +101,9 @@ class Level():
             # We then calculateEjection() to calculate the ejection vectors.
             # It also returns a boolenan that tells us whether the objects are actually overlaping on that axis
             # We start with the x axis:
-            calculateEjection([1,0], polygon, player.vertices, out_v, out_v_val)
+            collided = calculateEjection([1,0], polygon, player.vertices, out_v, out_v_val)
+            # If there was overlap, we then check the y axis:
+            collided = calculateEjection([0, 1], polygon, player.vertices, out_v, out_v_val)
 
     def update(self, mouse_z):
         diff = mouse_z-self.z
