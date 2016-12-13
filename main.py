@@ -161,7 +161,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Create sprites
-    level = Level("workfile")
+    level = Level("actual_level")
     player = Player(20, 20)
     collide = level.collide(player)
     x_speed = 0
@@ -174,18 +174,18 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_a:
                     x_speed = -1
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_d:
                     x_speed = 1
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_w:
                     y_speed = -1
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_s:
                     y_speed = 1
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_DOWN or event.key == pygame.K_UP:
+                if event.key == pygame.K_w or event.key == pygame.K_s:
                     y_speed = 0
-                elif event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_a or event.key == pygame.K_d:
                     x_speed = 0
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
