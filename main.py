@@ -45,8 +45,6 @@ def project(polygon, normal):
         projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
         sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
         projected.append(math.copysign(projected_l, sign_p))
-    if abs(min(projected)-max(projected))<1:
-        print(projected, normal, polygon)
     return [min(projected), max(projected)]
 
 def calculateEjection(normal, polygon, player, out_v, out_v_val):
@@ -62,7 +60,6 @@ def calculateEjection(normal, polygon, player, out_v, out_v_val):
             out_v_val.append(polygon_p[1] - player_p[0])
             out_v.append([(polygon_p[1] - player_p[0]) * normal[0], (polygon_p[1] - player_p[0]) * normal[1]])
         if (polygon_p[0] - player_p[1]) < 0:
-            # print(player_p[0], player_p[1], polygon_p[0], polygon_p[1], normal);
             out_v_val.append(player_p[1] - polygon_p[0])
             out_v.append([(polygon_p[0] - player_p[1]) * normal[0], (polygon_p[0] - player_p[1]) * normal[1]])
         collided = 1
@@ -131,9 +128,7 @@ class Level():
                             # Thanks to the rules of the Separating Axes Theorem
                             # we can stop checking when there is no overlap on at least one of the axes
                             break
-            # print("#")
             if collided:
-                # print(out_v)
                 return [1, out_v[out_v_val.index(min(out_v_val))]]
         # If the polygon list is empty, return 0 as the collision vector
         return [0, [0, 0]]
