@@ -45,6 +45,8 @@ def project(polygon, normal):
         projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
         sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
         projected.append(math.copysign(projected_l, sign_p))
+    if abs(min(projected)-max(projected))<1:
+        print(projected, normal, polygon)
     return [min(projected), max(projected)]
 
 def calculateEjection(normal, polygon, player, out_v, out_v_val):
@@ -53,13 +55,14 @@ def calculateEjection(normal, polygon, player, out_v, out_v_val):
     player_p = project(player, normal)
     collided = 0
     # We check whether there is overlap
-    if (polygon_p[1] < player_p[0]) or (polygon_p[0] > player_p[1]):
+    if (polygon_p[1] < player_p[0]) or (polygon_p[0] > player_p[1]) or polygon_p[1]-polygon_p[0]<1:
         collided = 0
     else:
-        if (polygon_p[1] - player_p[0]) >= 0:
+        if (polygon_p[1] - player_p[0]) > 0:
             out_v_val.append(polygon_p[1] - player_p[0])
             out_v.append([(polygon_p[1] - player_p[0]) * normal[0], (polygon_p[1] - player_p[0]) * normal[1]])
-        if (polygon_p[0] - player_p[1]) <= 0:
+        if (polygon_p[0] - player_p[1]) < 0:
+            # print(player_p[0], player_p[1], polygon_p[0], polygon_p[1], normal);
             out_v_val.append(player_p[1] - polygon_p[0])
             out_v.append([(polygon_p[0] - player_p[1]) * normal[0], (polygon_p[0] - player_p[1]) * normal[1]])
         collided = 1
@@ -113,9 +116,9 @@ class Level():
             if collided:
                 for i in range(len(polygon)):
                     nexti = (i + 1) % len(polygon)
-                    # Using vector substraction we obtain the vector representing the face...
+                    # Using vector subtraction we obtain the vector representing the face...
                     vector = [polygon[nexti][0] - polygon[i][0], polygon[nexti][1] - polygon[i][1]]
-                    # ...its lenght...
+                    # ...its length...
                     len_v = math.sqrt(vector[0] ** 2 + vector[1] ** 2)
                     # ... and convert it to a unit vector
                     unit_v = [vector[0] / len_v, vector[1] / len_v]
@@ -128,7 +131,9 @@ class Level():
                             # Thanks to the rules of the Separating Axes Theorem
                             # we can stop checking when there is no overlap on at least one of the axes
                             break
+            # print("#")
             if collided:
+                # print(out_v)
                 return [1, out_v[out_v_val.index(min(out_v_val))]]
         # If the polygon list is empty, return 0 as the collision vector
         return [0, [0, 0]]
@@ -174,18 +179,18 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
+                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     x_speed = -1
-                elif event.key == pygame.K_d:
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     x_speed = 1
-                elif event.key == pygame.K_w:
+                elif event.key == pygame.K_w or event.key == pygame.K_UP:
                     y_speed = -1
-                elif event.key == pygame.K_s:
+                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                     y_speed = 1
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_w or event.key == pygame.K_s:
+                if event.key == pygame.K_w or event.key == pygame.K_s or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     y_speed = 0
-                elif event.key == pygame.K_a or event.key == pygame.K_d:
+                elif event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     x_speed = 0
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
