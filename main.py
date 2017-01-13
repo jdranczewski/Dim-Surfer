@@ -21,7 +21,7 @@ class Player():
         self.y_speed += 0.2
         if self.y_speed > 5:
             self.y_speed = 5
-        if collided and y_speed < 0 and y_ev < 0:
+        if collided and y_speed < 0 and y_ev < -0.1:
             self.y_speed = -5
         self.x += self.x_speed
         self.y += self.y_speed
@@ -162,7 +162,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Create sprites
-    level = Level("square")
+    level = Level("actual_level")
     player = Player(20, 20)
     collide = level.collide(player)
     x_speed = 0
@@ -173,7 +173,6 @@ def main():
     # -------- Main Program Loop -----------
     while not done:
         # Event Processing
-        x_speed = x_right_contribution - x_left_contribution
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
@@ -181,8 +180,10 @@ def main():
                 print(event.key)
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     x_left_contribution = 1
+                    x_speed = -1
                 elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     x_right_contribution = 1
+                    x_speed = 1
                 elif event.key == pygame.K_w or event.key == pygame.K_UP:
                     y_speed = -1
                 elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
@@ -192,8 +193,16 @@ def main():
                     y_speed = 0
                 elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     x_left_contribution = 0
+                    if x_right_contribution == 1:
+                        x_speed = 1
+                    else:
+                        x_speed = 0
                 elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     x_right_contribution = 0
+                    if x_left_contribution == 1:
+                        x_speed = -1
+                    else:
+                        x_speed= 0
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
         mouse_y = pos[1]
