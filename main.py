@@ -9,7 +9,7 @@ class Player():
         self.y = 0
         self.x_speed = 0
         self.y_speed = 0
-        self.acceleration = 0.3
+        self.acceleration = 2
         self.decceleration = 0.95
         self.width = w
         self.height = h
@@ -17,12 +17,12 @@ class Player():
                          [self.x, self.y + self.width]]
 
     def update(self, x_speed, y_speed, collided, y_ev):
-        self.x_speed += x_speed * self.acceleration
-        self.y_speed += 0.1
+        self.x_speed = x_speed * self.acceleration
+        self.y_speed += 0.2
+        if self.y_speed > 5:
+            self.y_speed = 5
         if collided and y_speed < 0 and y_ev < 0:
-            self.y_speed = -10
-        self.x_speed *= self.decceleration
-        self.y_speed *= self.decceleration
+            self.y_speed = -5
         self.x += self.x_speed
         self.y += self.y_speed
         self.y = self.y % 500
@@ -56,12 +56,11 @@ def calculateEjection(normal, polygon, player, out_v, out_v_val):
     if (polygon_p[1] < player_p[0]) or (polygon_p[0] > player_p[1]) or polygon_p[1]-polygon_p[0]<1:
         collided = 0
     else:
-        if (polygon_p[1] - player_p[0]) > 0:
-            out_v_val.append(polygon_p[1] - player_p[0])
-            out_v.append([(polygon_p[1] - player_p[0]) * normal[0], (polygon_p[1] - player_p[0]) * normal[1]])
-        if (polygon_p[0] - player_p[1]) < 0:
-            out_v_val.append(player_p[1] - polygon_p[0])
-            out_v.append([(polygon_p[0] - player_p[1]) * normal[0], (polygon_p[0] - player_p[1]) * normal[1]])
+        out_v_val.append(polygon_p[1] - player_p[0])
+        out_v.append([(polygon_p[1] - player_p[0]) * normal[0], (polygon_p[1] - player_p[0]) * normal[1], normal])
+        # print(player_p[0], player_p[1], polygon_p[0], polygon_p[1], normal);
+        out_v_val.append(player_p[1] - polygon_p[0])
+        out_v.append([(polygon_p[0] - player_p[1]) * normal[0], (polygon_p[0] - player_p[1]) * normal[1], normal])
         collided = 1
     return collided
 
@@ -128,7 +127,9 @@ class Level():
                             # Thanks to the rules of the Separating Axes Theorem
                             # we can stop checking when there is no overlap on at least one of the axes
                             break
+            # print("#")
             if collided:
+                # print(out_v, out_v[out_v_val.index(min(out_v_val))])
                 return [1, out_v[out_v_val.index(min(out_v_val))]]
         # If the polygon list is empty, return 0 as the collision vector
         return [0, [0, 0]]
@@ -161,23 +162,27 @@ def main():
     clock = pygame.time.Clock()
 
     # Create sprites
-    level = Level("actual_level")
+    level = Level("square")
     player = Player(20, 20)
     collide = level.collide(player)
     x_speed = 0
+    x_right_contribution = 0
+    x_left_contribution = 0
     y_speed = 0
 
     # -------- Main Program Loop -----------
     while not done:
         # Event Processing
+        x_speed = x_right_contribution - x_left_contribution
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
             elif event.type == pygame.KEYDOWN:
+                print(event.key)
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    x_speed = -1
+                    x_left_contribution = 1
                 elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    x_speed = 1
+                    x_right_contribution = 1
                 elif event.key == pygame.K_w or event.key == pygame.K_UP:
                     y_speed = -1
                 elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
@@ -185,8 +190,10 @@ def main():
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     y_speed = 0
-                elif event.key == pygame.K_a or event.key == pygame.K_d or event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                    x_speed = 0
+                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                    x_left_contribution = 0
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                    x_right_contribution = 0
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
         mouse_y = pos[1]
